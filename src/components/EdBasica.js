@@ -37,16 +37,16 @@ const ExcelChartComponent = () => {
       let color;
       if (key === '1') {
         name = 'Federal';
-        color = '#009688'; // Verde
+        color = '#009688'; 
       } else if (key === '2') {
         name = 'Estadual';
-        color = '#FF5722'; // Laranja
+        color = '#FF5722'; 
       } else if (key === '3') {
         name = 'Municipal';
-        color = '#3F51B5'; // Azul
+        color = '#3F51B5'; 
       } else {
         name = 'Privada';
-        color = '#FFEB3B'; // Amarelo
+        color = '#FFEB3B'; 
       }
 
       return {
@@ -73,7 +73,7 @@ const ExcelChartComponent = () => {
             barHeight: '80%',
           },
         },
-        colors: ['#009688', '#FF5722', '#3F51B5', '#FFEB3B'], // Cores das barras
+        colors: ['#009688', '#FF5722', '#3F51B5', '#FFEB3B'], 
         tooltip: {
           enabled: true,
           x: {

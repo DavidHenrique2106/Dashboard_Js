@@ -39,6 +39,9 @@ function App() {
           <SchoolBuildingChart />
         </section>
       </main>
+      <footer>
+        <Footer/>
+      </footer>
     </div>
   );
 }
