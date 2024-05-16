@@ -7,8 +7,12 @@ import SchoolTypeChart from './components/RespRegula';
 import SchoolBuildingChart from './components/TipoPredio';
 import Footer from './components/Footer';
 import Presentation from './components/Apresentacao';
+import DataBack from './components/DataBack';
+
 
 function App() {
+
+
   const appStyle = {
     fontFamily: 'Arial, sans-serif',
     textAlign: 'center',
@@ -76,6 +80,9 @@ function App() {
       <footer style={footerStyle}>
         <Footer style={footerStyle} />
       </footer>
+      <section>
+        <DataBack/>
+      </section>
     </div>
   );
 }
