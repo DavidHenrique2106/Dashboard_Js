@@ -1,38 +1,37 @@
 import React from 'react';
+import styled from 'styled-components';
 
 const Footer = () => {
-  const footerStyle = {
-    backgroundColor: '#f5f5f5',
-    padding: '20px',
-    textAlign: 'center'
-  };
-
-  const contentStyle = {
-    maxWidth: '800px',
-    margin: '0 auto'
-  };
-
-  const contactStyle = {
-    marginTop: '10px'
-  };
-
-  const linkStyle = {
-    color: '#007bff',
-    textDecoration: 'none'
-  };
-
   return (
-    <footer style={footerStyle}>
-      <div style={contentStyle}>
-        <p style={{marginBottom: '10px'}}>&copy; David Henrique</p>
-        <div style={contactStyle}>
-          <p>Email: <a href="mailto:dh210605@gmail.com" style={linkStyle}>dh210605@gmail.com</a></p>
-          <p>Whats: <a href="tel:+5581983181645" style={linkStyle}>(81) 9.8318-1645</a></p>
-          <p>Linkedin: <a href="https://www.linkedin.com/in/david-henrique" style={linkStyle}>David Henrique</a></p>
-        </div>
-      </div>
-    </footer>
+    <FooterContainer>
+      <FooterContent>
+        <FooterText>&copy; David Henrique</FooterText>
+        <FooterText>&copy; David Pontes</FooterText>
+        <FooterText>&copy; Gabriel Miranda</FooterText>
+        <FooterText>&copy; Luis Henrique</FooterText>
+        <FooterText>&copy; Erick Abraão</FooterText>
+      </FooterContent>
+    </FooterContainer>
   );
-}
+};
+
+const FooterContainer = styled.footer`
+  background-color: #f5f5f5;
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px; /* Small border radius */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Small box shadow */
+  margin-top: 20px;
+`;
+
+const FooterContent = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const FooterText = styled.p`
+  margin-bottom: 10px;
+  color: #333;
+`;
 
 export default Footer;

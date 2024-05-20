@@ -9,7 +9,7 @@ const Presentation = () => {
         <li><Paragraph>Desenvolvimento de um Dashboard interativo para análise de dados do Censo Escolar 2023.</Paragraph></li>
         <li><Paragraph>Incorporação de gráficos e informações resumidas para facilitar a compreensão dos dados.</Paragraph></li>
         <li><Paragraph>Disponibilização de dados brutos para usuários avançados que desejam realizar análises específicas.</Paragraph></li>
-        <li><Paragraph>Utilização de tecnologias de Programação para Web, Engenharia de Software e Estatística para garantir a eficiência e precisão do Dashboard.</Paragraph></li>
+        <li><Paragraph>Utilização de tecnologias de Programação para Web, Banco de dados, Engenharia de Software e Estatística para garantir a eficiência e precisão do Dashboard.</Paragraph></li>
       </PresentationList>
     </PresentationContainer>
   );
