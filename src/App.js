@@ -13,7 +13,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
-    background-color: #d3d3d3;
+    background-color: #A020F0;
     font-family: 'Arial, sans-serif';
   }
 `;
@@ -23,7 +23,7 @@ const AppContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #d3d3d3;
+  background-color: #FFA832;
 `;
 
 const Header = styled.header`

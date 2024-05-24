@@ -5,11 +5,7 @@ const Footer = () => {
   return (
     <FooterContainer>
       <FooterContent>
-        <FooterText>&copy; David Henrique</FooterText>
-        <FooterText>&copy; David Pontes</FooterText>
-        <FooterText>&copy; Gabriel Miranda</FooterText>
-        <FooterText>&copy; Luis Henrique</FooterText>
-        <FooterText>&copy; Erick Abraão</FooterText>
+        <FooterText>&copy; David Henrique , &copy; David Pontes, &copy; Gabriel Miranda, &copy; Luis Henrique, &copy; Erick Abraão</FooterText>
       </FooterContent>
     </FooterContainer>
   );
