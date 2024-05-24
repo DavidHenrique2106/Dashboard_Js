@@ -62,7 +62,7 @@ function App() {
       <GlobalStyle />
       <AppContainer>
         <Header>
-          <Title>Gráficos de Educação Básica no Brasil (Censo de 2023)</Title>
+          <Title>Gráficos com dados da Educação Básica no Brasil (Censo de 2023)</Title>
         </Header>
         <main>
           <section>
