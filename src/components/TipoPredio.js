@@ -54,6 +54,7 @@ const SchoolBuildingChart = () => {
 
     const chartData = {
       options: {
+        colors:["#92FD8CFF"],
         chart: {
           type: 'area',
         },
@@ -79,7 +80,8 @@ const SchoolBuildingChart = () => {
 
   return (
     <div>
-      <h1>Tipo de ocupação em prédio escolar em Camaçari - BA</h1>
+      const element = <h1 style={{ color: 'white' }}>Tipo de ocupação em prédio escolar em Camaçari - BA
+    </h1>
       <Chart options={chartData.options} series={chartData.series} type="area" height={400} />
     </div>
   );

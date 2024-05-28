@@ -70,6 +70,7 @@ const SchoolTypeChart = () => {
 
     const chartData = {
       options: {
+        colors: ["#92FD8CFF"],
         chart: {
           type: 'bar',
         },
@@ -99,7 +100,7 @@ const SchoolTypeChart = () => {
 
   return (
     <div>
-      <h1>Distribuição de tipos de escolas Recife - PE</h1>
+      const element = <h1 style={{ color: 'white' }}>Distribuição de tipos de escolas Recife - PE</h1>
       <Chart options={chartData.options} series={chartData.series} type="bar" height={400} />
     </div>
   );

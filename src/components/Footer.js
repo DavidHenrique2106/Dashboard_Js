@@ -12,12 +12,12 @@ const Footer = () => {
 };
 
 const FooterContainer = styled.footer`
-  background-color: #f5f5f5;
-  padding: 20px;
-  text-align: center;
-  border-radius: 8px; /* Small border radius */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Small box shadow */
-  margin-top: 20px;
+    background-color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px; /* Small border radius */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Small box shadow */
+    margin-top: 20px;
 `;
 
 const FooterContent = styled.div`

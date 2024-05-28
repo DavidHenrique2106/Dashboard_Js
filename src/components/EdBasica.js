@@ -37,16 +37,16 @@ const ExcelChartComponent = () => {
       let color;
       if (key === '1') {
         name = 'Federal';
-        color = '#009688'; 
+        color = '#ffffff';
       } else if (key === '2') {
         name = 'Estadual';
-        color = '#FF5722'; 
+        color = '#ffffff';
       } else if (key === '3') {
         name = 'Municipal';
-        color = '#3F51B5'; 
+        color = '#ffffff';
       } else {
         name = 'Privada';
-        color = '#FFEB3B'; 
+        color = '#ffffff';
       }
 
       return {
@@ -73,7 +73,7 @@ const ExcelChartComponent = () => {
             barHeight: '80%',
           },
         },
-        colors: ['#009688', '#FF5722', '#3F51B5', '#FFEB3B'], 
+        colors: ['#92fd8c', '#ff2222', '#1fff00', '#FFEB3B'],
         tooltip: {
           enabled: true,
           x: {
@@ -100,7 +100,7 @@ const ExcelChartComponent = () => {
 
   return (
     <div>
-      <h1>Dependência regulamento das Escolas em Porto Velho - RO</h1>
+      const element = <h1 style={{color: 'white'}}><h1>Dependência regulamento das Escolas em Porto Velho - RO</h1></h1>
       <Chart options={chartData.options} series={chartData.series} type="bar" height={400} />
       <br />
     </div>

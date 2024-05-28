@@ -46,6 +46,7 @@ const UrbanRuralSchoolsChart = () => {
 
     const chartData = {
       options: {
+        colors: ["#92FD8CFF"],
         chart: {
           type: 'line',
         },
@@ -70,7 +71,8 @@ const UrbanRuralSchoolsChart = () => {
 
   return (
     <div>
-      <h1>Distribuição escolas áreas urbanas e rurais em Paulista - PE</h1>
+      const element = <h1 style={{color: 'white'}}>Distribuição escolas áreas urbanas e rurais em Paulista - PE
+    </h1>
       <Chart options={chartData.options} series={chartData.series} type="line" height={400} />
     </div>
   );

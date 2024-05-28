@@ -49,6 +49,7 @@ const SchoolStatusChart = () => {
 
     const chartData = {
       options: {
+        colors:["#92fd8c","#ff5959", "#a6a6a6" ],
         chart: {
           type: 'pie',
         },
@@ -66,8 +67,8 @@ const SchoolStatusChart = () => {
 
   return (
     <div>
-      <h1> Status de funcionamento das escolas de Caori - RO</h1>
-      <Chart options={chartData.options} series={chartData.series} type="pie" height={400} />
+      const element = <h1 style={{ color: 'white' }}>Status de funcionamento das escolas de Caori - RO</h1>
+      <Chart options={chartData.options} series={chartData.series} type="pie" height={400}/>
     </div>
   );
 };
