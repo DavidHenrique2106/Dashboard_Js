@@ -71,6 +71,9 @@ const UrbanRuralSchoolsChart = () => {
   return (
     <div>
       <h1>Distribuição escolas áreas urbanas e rurais em Paulista - PE</h1>
+      <p>aqui está um grafíco amostrando a Distribuição de escolas, nas areas urbanas e rurais de Paulista
+        percebesse que se obtem mais escolas na area urbana, sendo ela 97.27% e na rural 2.73
+      </p>
       <Chart options={chartData.options} series={chartData.series} type="line" height={400} />
     </div>
   );

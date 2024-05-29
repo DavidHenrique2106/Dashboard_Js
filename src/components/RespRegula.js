@@ -100,6 +100,10 @@ const SchoolTypeChart = () => {
   return (
     <div>
       <h1>Distribuição de tipos de escolas Recife - PE</h1>
+      <p>
+        Em Recife por ser uma cidade totalmente urbana, as escolas são dividas em Fedral, Estadual e Municipal 
+        veja no grafíco abaixo a distribuição de escolas na cidade. 
+      </p>
       <Chart options={chartData.options} series={chartData.series} type="bar" height={400} />
     </div>
   );

@@ -101,6 +101,9 @@ const ExcelChartComponent = () => {
   return (
     <div>
       <h1>Dependência regulamento das Escolas em Porto Velho - RO</h1>
+      <p>Em porto Velho usamos alguns graficos para mostrar quais escoals tem 
+        Dependência de regulamento em porto Velho
+      </p>
       <Chart options={chartData.options} series={chartData.series} type="bar" height={400} />
       <br />
     </div>

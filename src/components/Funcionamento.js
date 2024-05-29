@@ -67,6 +67,8 @@ const SchoolStatusChart = () => {
   return (
     <div>
       <h1> Status de funcionamento das escolas de Caori - RO</h1>
+      <p> Nas escolas de Caori, usamos um grafico tipo "PIE" para mostrar a porcentagem de escolas 
+        que estão em funcionamento na cidade. </p>
       <Chart options={chartData.options} series={chartData.series} type="pie" height={400} />
     </div>
   );
