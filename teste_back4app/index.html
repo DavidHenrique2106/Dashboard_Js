@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Gráfico de Pizza</title>
+  <title>Dashboard Gráfico Do Censo Escolar</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     canvas {
@@ -14,7 +13,7 @@
   </style>
 </head>
 <body class="container mt-5">
-  <h1 class="text-center mb-4">Dashboard Gráfico de Pizza</h1>
+  <h1 class="text-center mb-4">Dashboard Gráfico Do Censo Escolar</h1>
 
   <div id="filters" class="mb-4">
     <div class="row g-3">
@@ -25,6 +24,8 @@
           <option value="TP_LOCALIZACAO">Localização</option>
           <option value="TP_OCUPACAO_PREDIO_ESCOLAR">Ocupação do Prédio Escolar</option>
           <option value="SG_UF">UF</option>
+          <option value="TP_DEPENDENCIA">Dependência</option>
+          <option value="TP_RESPONSAVEL_REGULAMENTACAO">Regulamentação:</option>
         </select>
       </div>
       <div class="col-md-3">
@@ -95,76 +96,110 @@
           <option value="">Todos</option>
         </select>
       </div>
+      <div class="col-md-3">
+        <label for="filterRegulamentacao" class="form-label">Responsável pela Regulamentação:</label>
+        <select id="filterRegulamentacao" class="form-select" onchange="updateChart()">
+          <option value="">Todos</option>
+          <option value="1">Federal</option>
+          <option value="2">Estadual</option>
+          <option value="3">Municipal</option>
+          <option value="4">Estadual e Municipal</option>
+          <option value="5">Federal e Estadual</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="filterDependencia" class="form-label">Dependência Administrativa:</label>
+        <select id="filterDependencia" class="form-select" onchange="updateChart()">
+          <option value="">Todos</option>
+          <option value="1">Federal</option>
+          <option value="2">Estadual</option>
+          <option value="3">Municipal</option>
+          <option value="4">Privada</option>
+        </select>
+      </div>
     </div>
   </div>
-
   <canvas id="myChart" width="400" height="400"></canvas>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/2.18.0/parse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <script>
-    // Configuração do Parse
-    Parse.initialize(
-      'cb1cixfb0XLZ8EnoMuI3SN6Pl1aMhZtUqJQ71A8d', // Application ID
-      'S90kbXG5ewSljML3FQth67ryG3xOHv9ZsGWfbS2Y'  // JavaScript key
-    );
-    Parse.serverURL = 'https://parseapi.back4app.com';
+    // Configuração
+ 
+Parse.initialize(
+'e5UX3sOvZfOY3qwvIdw0b7v18JdUn9ihz34chyhF', // Application ID
+'rSRY7ybwkJThcFwIQirObv3v83Bfa40LWPyaZQNf' // JavaScript key
+);
+Parse.serverURL = 'https://parseapi.back4app.com';
 
-    let myChart;
+let myChart;
 
-    const columnMapping = {
-      "TP_SITUACAO_FUNCIONAMENTO": {
-        "1": "Em Atividade",
-        "2": "Paralisada",
-        "3": "Extinta (ano do Censo)",
-        "4": "Extinta em Anos Anteriores"
-      },
-      "TP_LOCALIZACAO": {
-        "1": "Urbana",
-        "2": "Rural"
-      },
-      "TP_OCUPACAO_PREDIO_ESCOLAR": {
-        "1": "Próprio",
-        "2": "Alugado",
-        "3": "Cedido"
-      }
-    };
+const columnMapping = {
+  "TP_SITUACAO_FUNCIONAMENTO": {
+    "1": "Em Atividade",
+    "2": "Paralisada",
+    "3": "Extinta (ano do Censo)",
+    "4": "Extinta em Anos Anteriores"
+  },
+  "TP_LOCALIZACAO": {
+    "1": "Urbana",
+    "2": "Rural"
+  },
+  "TP_OCUPACAO_PREDIO_ESCOLAR": {
+    "1": "Próprio",
+    "2": "Alugado",
+    "3": "Cedido"
+  },
+  "TP_DEPENDENCIA":{
+    "1": " Federal",
+    "2": "Estadual",
+    "3": "Municipal",
+    "4": "Privada",
+  },
+  "TP_RESPONSAVEL_REGULAMENTACAO":{
+    "1" : "Federal",
+    "2" :"Estadual",
+    "3" :"Municipal",
+    "4" :"Estadual e Municipal",
+    "5" : "Federal e Estadual"
+  }
+};
 
-    async function fetchTopMunicipiosByEstado(estado) {
-      const topMunicipiosPorEstado = {
-        "AC": ["Rio Branco", "Cruzeiro do Sul", "Sena Madureira", "Feijó", "Tarauacá"],
-        "AL": ["Maceió", "Arapiraca", "Rio Largo", "Palmeira dos Índios", "São Miguel dos Campos"],
-        "AP": ["Macapá", "Santana", "Laranjal do Jari", "Oiapoque", "Mazagão"],
-        "AM": ["Manaus", "Parintins", "Itacoatiara", "Manacapuru", "Coari"],
-        "BA": ["Salvador", "Feira de Santana", "Vitória da Conquista", "Camaçari", "Itabuna"],
-        "CE": ["Fortaleza", "Caucaia", "Juazeiro do Norte", "Maracanaú", "Sobral"],
-        "DF": ["Brasília"],
-        "ES": ["Vitória", "Vila Velha", "Serra", "Cariacica", "Cachoeiro de Itapemirim"],
-        "GO": ["Goiânia", "Aparecida de Goiânia", "Anápolis", "Rio Verde", "Luziânia"],
-        "MA": ["São Luís", "Imperatriz", "São José de Ribamar", "Timon", "Caxias"],
-        "MT": ["Cuiabá", "Várzea Grande", "Rondonópolis", "Sinop", "Tangará da Serra"],
-        "MS": ["Campo Grande", "Dourados", "Três Lagoas", "Corumbá", "Ponta Porã"],
-        "MG": ["Belo Horizonte", "Uberlândia", "Contagem", "Juiz de Fora", "Betim"],
-        "PA": ["Belém", "Ananindeua", "Santarém", "Marabá", "Parauapebas"],
-        "PB": ["João Pessoa", "Campina Grande", "Santa Rita", "Patos", "Bayeux"],
-        "PR": ["Curitiba", "Londrina", "Maringá", "Ponta Grossa", "Cascavel"],
-        "PE": ["Recife", "Jaboatão dos Guararapes", "Olinda", "Caruaru", "Petrolina"],
-        "PI": ["Teresina", "Parnaíba", "Picos", "Campo Maior", "Floriano"],
-        "RJ": ["Rio de Janeiro", "São Gonçalo", "Duque de Caxias", "Nova Iguaçu", "Niterói"],
-        "RN": ["Natal", "Mossoró", "Parnamirim", "São Gonçalo do Amarante", "Macaíba"],
-        "RS": ["Porto Alegre", "Caxias do Sul", "Pelotas", "Canoas", "Santa Maria"],
-        "RO": ["Porto Velho", "Ji-Paraná", "Ariquemes", "Vilhena", "Cacoal"],
-        "RR": ["Boa Vista", "Rorainópolis", "Caracaraí", "Pacaraima", "Alto Alegre"],
-        "SC": ["Florianópolis", "Joinville", "Blumenau", "São José", "Criciúma"],
-        "SP": ["São Paulo", "Guarulhos", "Campinas", "São Bernardo do Campo", "Santo André"],
-        "SE": ["Aracaju", "Nossa Senhora do Socorro", "Lagarto", "Itabaiana", "São Cristóvão"],
-        "TO": ["Palmas", "Araguaína", "Gurupi", "Porto Nacional", "Paraíso do Tocantins"]
-      };
-      return topMunicipiosPorEstado[estado] || [];
-    }
+async function fetchTopMunicipiosByEstado(estado) {
+  const topMunicipiosPorEstado = {
+    "AC": ["Rio Branco", "Cruzeiro do Sul", "Sena Madureira", "Feijó", "Tarauacá"],
+    "AL": ["Maceió", "Arapiraca", "Rio Largo", "Palmeira dos Índios", "São Miguel dos Campos"],
+    "AP": ["Macapá", "Santana", "Laranjal do Jari", "Oiapoque", "Mazagão"],
+    "AM": ["Manaus", "Parintins", "Itacoatiara", "Manacapuru", "Coari"],
+    "BA": ["Salvador", "Feira de Santana", "Vitória da Conquista", "Camaçari", "Itabuna"],
+    "CE": ["Fortaleza", "Caucaia", "Juazeiro do Norte", "Maracanaú", "Sobral"],
+    "DF": ["Brasília"],
+    "ES": ["Vitória", "Vila Velha", "Serra", "Cariacica", "Cachoeiro de Itapemirim"],
+    "GO": ["Goiânia", "Aparecida de Goiânia", "Anápolis", "Rio Verde", "Luziânia"],
+    "MA": ["São Luís", "Imperatriz", "São José de Ribamar", "Timon", "Caxias"],
+    "MT": ["Cuiabá", "Várzea Grande", "Rondonópolis", "Sinop", "Tangará da Serra"],
+    "MS": ["Campo Grande", "Dourados", "Três Lagoas", "Corumbá", "Ponta Porã"],
+    "MG": ["Belo Horizonte", "Uberlândia", "Contagem", "Juiz de Fora", "Betim"],
+    "PA": ["Belém", "Ananindeua", "Santarém", "Marabá", "Parauapebas"],
+    "PB": ["João Pessoa", "Campina Grande", "Santa Rita", "Patos", "Bayeux"],
+    "PR": ["Curitiba", "Londrina", "Maringá", "Ponta Grossa", "Cascavel"],
+    "PE": ["Recife", "Jaboatão dos Guararapes", "Olinda", "Caruaru", "Petrolina"],
+    "PI": ["Teresina", "Parnaíba", "Picos", "Campo Maior", "Floriano"],
+    "RJ": ["Rio de Janeiro", "São Gonçalo", "Duque de Caxias", "Nova Iguaçu", "Niterói"],
+    "RN": ["Natal", "Mossoró", "Parnamirim", "São Gonçalo do Amarante", "Macaíba"],
+    "RS": ["Porto Alegre", "Caxias do Sul", "Pelotas", "Canoas", "Santa Maria"],
+    "RO": ["Porto Velho", "Ji-Paraná", "Ariquemes", "Vilhena", "Cacoal"],
+    "RR": ["Boa Vista", "Rorainópolis", "Caracaraí", "Pacaraima", "Alto Alegre"],
+    "SC": ["Florianópolis", "Joinville", "Blumenau", "São José", "Criciúma"],
+    "SP": ["São Paulo", "Guarulhos", "Campinas", "São Bernardo do Campo", "Santo André"],
+    "SE": ["Aracaju", "Nossa Senhora do Socorro", "Lagarto", "Itabaiana", "São Cristóvão"],
+    "TO": ["Palmas", "Araguaína", "Gurupi", "Porto Nacional", "Paraíso do Tocantins"]
+  };
+  return topMunicipiosPorEstado[estado] || [];
+}
 
-    async function updateMunicipiosSelect() {
+async function updateMunicipiosSelect() {
       const uf = document.getElementById('filterUF').value;
       const municipioSelect = document.getElementById('filterMunicipio');
 
@@ -183,7 +218,7 @@
       }
     }
 
-    async function fetchData(column) {
+async function fetchData(column) {
   const Dashboard = Parse.Object.extend('Dashboard');
   const query = new Parse.Query(Dashboard);
 
@@ -193,7 +228,17 @@
   const ocupacao = document.getElementById('filterOcupacao').value;
   const uf = document.getElementById('filterUF').value;
   const municipio = document.getElementById('filterMunicipio').value;
+  const dependencia = document.getElementById('filterDependencia').value;
+  const regulamentacao = document.getElementById('filterRegulamentacao').value;
 
+  if (dependencia) {
+    query.equalTo("TP_DEPENDENCIA", dependencia);
+  }
+  if (regulamentacao) {
+    query.equalTo("TP_RESPONSAVEL_REGULAMENTACAO", regulamentacao);
+  }
+
+  // Removendo os filtros vazios para não limitar a consulta
   if (situacao) {
     query.equalTo("TP_SITUACAO_FUNCIONAMENTO", situacao);
   }
@@ -223,6 +268,7 @@
 
   return dataCount;
 }
+
 async function updateChart() {
   const column = document.getElementById('columnSelect').value;
   const data = await fetchData(column);
@@ -355,361 +401,3 @@ async function updateChart() {
   </script>
 </body>
 </html>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Gráfico de Pizza</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    canvas {
-      display: block;
-      margin: 0 auto;
-    }
-  </style>
-</head>
-<body class="container mt-5">
-  <h1 class="text-center mb-4">Dashboard Gráfico de Pizza</h1>
-
-  <div id="filters" class="mb-4">
-    <div class="row g-3">
-      <div class="col-md-3">
-        <label for="columnSelect" class="form-label">Selecionar Coluna:</label>
-        <select id="columnSelect" class="form-select" onchange="updateChart()">
-          <option value="TP_SITUACAO_FUNCIONAMENTO">Situação de Funcionamento</option>
-          <option value="TP_LOCALIZACAO">Localização</option>
-          <option value="TP_OCUPACAO_PREDIO_ESCOLAR">Ocupação do Prédio Escolar</option>
-          <option value="SG_UF">UF</option>
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label for="filterSituacao" class="form-label">Situação de Funcionamento:</label>
-        <select id="filterSituacao" class="form-select" onchange="updateChart()">
-          <option value="">Todos</option>
-          <option value="1">Em Atividade</option>
-          <option value="2">Paralisada</option>
-          <option value="3">Extinta (ano do Censo)</option>
-          <option value="4">Extinta em Anos Anteriores</option>
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label for="filterLocalizacao" class="form-label">Localização:</label>
-        <select id="filterLocalizacao" class="form-select" onchange="updateChart()">
-          <option value="">Todos</option>
-          <option value="1">Urbana</option>
-          <option value="2">Rural</option>
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label for="filterOcupacao" class="form-label">Ocupação do Prédio Escolar:</label>
-        <select id="filterOcupacao" class="form-select" onchange="updateChart()">
-          <option value="">Todos</option>
-          <option value="1">Próprio</option>
-          <option value="2">Alugado</option>
-          <option value="3">Cedido</option>
-        </select>
-      </div>
-    </div>
-    <div class="row g-3 mt-3">
-      <div class="col-md-3">
-        <label for="filterUF" class="form-label">UF:</label>
-        <select id="filterUF" class="form-select" onchange="updateMunicipiosSelect()">
-          <option value="">Todos</option>
-          <option value="AC">AC</option>
-          <option value="AL">AL</option>
-          <option value="AP">AP</option>
-          <option value="AM">AM</option>
-          <option value="BA">BA</option>
-          <option value="CE">CE</option>
-          <option value="DF">DF</option>
-          <option value="ES">ES</option>
-          <option value="GO">GO</option>
-          <option value="MA">MA</option>
-          <option value="MT">MT</option>
-          <option value="MS">MS</option>
-          <option value="MG">MG</option>
-          <option value="PA">PA</option>
-          <option value="PB">PB</option>
-          <option value="PR">PR</option>
-          <option value="PE">PE</option>
-          <option value="PI">PI</option>
-          <option value="RJ">RJ</option>
-          <option value="RN">RN</option>
-          <option value="RS">RS</option>
-          <option value="RO">RO</option>
-          <option value="RR">RR</option>
-          <option value="SC">SC</option>
-          <option value="SP">SP</option>
-          <option value="SE">SE</option>
-          <option value="TO">TO</option>
-        </select>
-      </div>
-      <div class="col-md-3">
-        <label for="filterMunicipio" class="form-label">Município:</label>
-        <select id="filterMunicipio" class="form-select" onchange="updateChart()">
-          <option value="">Todos</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <canvas id="myChart" width="400" height="400"></canvas>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/parse/2.18.0/parse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0/dist/chartjs-plugin-datalabels.min.js"></script>
-  <script>
-    // Configuração do Parse
-    Parse.initialize(
-      'cb1cixfb0XLZ8EnoMuI3SN6Pl1aMhZtUqJQ71A8d', // Application ID
-      'S90kbXG5ewSljML3FQth67ryG3xOHv9ZsGWfbS2Y'  // JavaScript key
-    );
-    Parse.serverURL = 'https://parseapi.back4app.com';
-
-    let myChart;
-
-    const columnMapping = {
-      "TP_SITUACAO_FUNCIONAMENTO": {
-        "1": "Em Atividade",
-        "2": "Paralisada",
-        "3": "Extinta (ano do Censo)",
-        "4": "Extinta em Anos Anteriores"
-      },
-      "TP_LOCALIZACAO": {
-        "1": "Urbana",
-        "2": "Rural"
-      },
-      "TP_OCUPACAO_PREDIO_ESCOLAR": {
-        "1": "Próprio",
-        "2": "Alugado",
-        "3": "Cedido"
-      }
-    };
-
-    async function fetchTopMunicipiosByEstado(estado) {
-      const topMunicipiosPorEstado = {
-        "AC": ["Rio Branco", "Cruzeiro do Sul", "Sena Madureira", "Feijó", "Tarauacá"],
-        "AL": ["Maceió", "Arapiraca", "Rio Largo", "Palmeira dos Índios", "São Miguel dos Campos"],
-        "AP": ["Macapá", "Santana", "Laranjal do Jari", "Oiapoque", "Mazagão"],
-        "AM": ["Manaus", "Parintins", "Itacoatiara", "Manacapuru", "Coari"],
-        "BA": ["Salvador", "Feira de Santana", "Vitória da Conquista", "Camaçari", "Itabuna"],
-        "CE": ["Fortaleza", "Caucaia", "Juazeiro do Norte", "Maracanaú", "Sobral"],
-        "DF": ["Brasília"],
-        "ES": ["Vitória", "Vila Velha", "Serra", "Cariacica", "Cachoeiro de Itapemirim"],
-        "GO": ["Goiânia", "Aparecida de Goiânia", "Anápolis", "Rio Verde", "Luziânia"],
-        "MA": ["São Luís", "Imperatriz", "São José de Ribamar", "Timon", "Caxias"],
-        "MT": ["Cuiabá", "Várzea Grande", "Rondonópolis", "Sinop", "Tangará da Serra"],
-        "MS": ["Campo Grande", "Dourados", "Três Lagoas", "Corumbá", "Ponta Porã"],
-        "MG": ["Belo Horizonte", "Uberlândia", "Contagem", "Juiz de Fora", "Betim"],
-        "PA": ["Belém", "Ananindeua", "Santarém", "Marabá", "Parauapebas"],
-        "PB": ["João Pessoa", "Campina Grande", "Santa Rita", "Patos", "Bayeux"],
-        "PR": ["Curitiba", "Londrina", "Maringá", "Ponta Grossa", "Cascavel"],
-        "PE": ["Recife", "Jaboatão dos Guararapes", "Olinda", "Caruaru", "Petrolina"],
-        "PI": ["Teresina", "Parnaíba", "Picos", "Campo Maior", "Floriano"],
-        "RJ": ["Rio de Janeiro", "São Gonçalo", "Duque de Caxias", "Nova Iguaçu", "Niterói"],
-        "RN": ["Natal", "Mossoró", "Parnamirim", "São Gonçalo do Amarante", "Macaíba"],
-        "RS": ["Porto Alegre", "Caxias do Sul", "Pelotas", "Canoas", "Santa Maria"],
-        "RO": ["Porto Velho", "Ji-Paraná", "Ariquemes", "Vilhena", "Cacoal"],
-        "RR": ["Boa Vista", "Rorainópolis", "Caracaraí", "Pacaraima", "Alto Alegre"],
-        "SC": ["Florianópolis", "Joinville", "Blumenau", "São José", "Criciúma"],
-        "SP": ["São Paulo", "Guarulhos", "Campinas", "São Bernardo do Campo", "Santo André"],
-        "SE": ["Aracaju", "Nossa Senhora do Socorro", "Lagarto", "Itabaiana", "São Cristóvão"],
-        "TO": ["Palmas", "Araguaína", "Gurupi", "Porto Nacional", "Paraíso do Tocantins"]
-      };
-      return topMunicipiosPorEstado[estado] || [];
-    }
-
-    async function updateMunicipiosSelect() {
-      const uf = document.getElementById('filterUF').value;
-      const municipioSelect = document.getElementById('filterMunicipio');
-
-      // Limpa as opções do select de município
-      municipioSelect.innerHTML = '<option value="">Todos</option>';
-
-      if (uf) {
-        const municipios = await fetchTopMunicipiosByEstado(uf);
-        municipios.forEach(municipio => {
-          const option = document.createElement('option');
-          option.value = municipio;
-          option.textContent = municipio;
-          municipioSelect.appendChild(option);
-        });
-        updateChart(); // Atualiza o gráfico quando um UF é selecionado
-      }
-    }
-
-    async function fetchData(column) {
-  const Dashboard = Parse.Object.extend('Dashboard');
-  const query = new Parse.Query(Dashboard);
-
-  // Adicionando filtros conforme os valores selecionados
-  const situacao = document.getElementById('filterSituacao').value;
-  const localizacao = document.getElementById('filterLocalizacao').value;
-  const ocupacao = document.getElementById('filterOcupacao').value;
-  const uf = document.getElementById('filterUF').value;
-  const municipio = document.getElementById('filterMunicipio').value;
-
-  if (situacao) {
-    query.equalTo("TP_SITUACAO_FUNCIONAMENTO", situacao);
-  }
-  if (localizacao) {
-    query.equalTo("TP_LOCALIZACAO", localizacao);
-  }
-  if (ocupacao) {
-    query.equalTo("TP_OCUPACAO_PREDIO_ESCOLAR", ocupacao);
-  }
-  if (uf) {
-    query.equalTo("SG_UF", uf);
-  }
-  if (municipio) {
-    query.equalTo("NO_MUNICIPIO", municipio);
-  }
-
-  query.limit(217625);  // Ajuste o limite conforme necessário
-  const results = await query.find();
-
-  const dataCount = {};
-
-  results.forEach((result) => {
-    const value = result.get(column);
-    const label = columnMapping[column] && columnMapping[column][value] ? columnMapping[column][value] : value;
-    dataCount[label] = (dataCount[label] || 0) + 1;
-  });
-
-  return dataCount;
-}
-async function updateChart() {
-  const column = document.getElementById('columnSelect').value;
-  const data = await fetchData(column);
-
-  const labels = Object.keys(data);
-  const values = Object.values(data);
-  const total = values.reduce((sum, value) => sum + value, 0);
-
-  if (myChart) {
-    myChart.destroy(); // Destruir o gráfico anterior, se existir
-  }
-
-  const ctx = document.getElementById('myChart').getContext('2d');
-  myChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: column,
-        data: values,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-          'rgba(255, 0, 0, 0.2)',
-          'rgba(0, 255, 0, 0.2)',
-          'rgba(0, 0, 255, 0.2)',
-          'rgba(255, 255, 0, 0.2)',
-          'rgba(255, 0, 255, 0.2)',
-          'rgba(0, 255, 255, 0.2)',
-          'rgba(128, 0, 0, 0.2)',
-          'rgba(0, 128, 0, 0.2)',
-          'rgba(0, 0, 128, 0.2)',
-          'rgba(128, 128, 0, 0.2)',
-          'rgba(128, 0, 128, 0.2)',
-          'rgba(0, 128, 128, 0.2)',
-          'rgba(128, 128, 128, 0.2)',
-          'rgba(64, 0, 0, 0.2)',
-          'rgba(0, 64, 0, 0.2)',
-          'rgba(0, 0, 64, 0.2)',
-          'rgba(64, 64, 0, 0.2)',
-          'rgba(64, 0, 64, 0.2)',
-          'rgba(0, 64, 64, 0.2)',
-          'rgba(64, 64, 64, 0.2)',
-          'rgba(192, 0, 0, 0.2)',
-          'rgba(0, 192, 0, 0.2)',
-          'rgba(0, 0, 192, 0.2)',
-          'rgba(192, 192, 0, 0.2)',
-          'rgba(192, 0, 192, 0.2)',
-          'rgba(0, 192, 192, 0.2)',
-          'rgba(192, 192, 192, 0.2)'
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-          'rgba(255, 0, 0, 1)',
-          'rgba(0, 255, 0, 1)',
-          'rgba(0, 0, 255, 1)',
-          'rgba(255, 255, 0, 1)',
-          'rgba(255, 0, 255, 1)',
-          'rgba(0, 255, 255, 1)',
-          'rgba(128, 0, 0, 1)',
-          'rgba(0, 128, 0, 1)',
-          'rgba(0, 0, 128, 1)',
-          'rgba(128, 128, 0, 1)',
-          'rgba(128, 0, 128, 1)',
-          'rgba(0, 128, 128, 1)',
-          'rgba(128, 128, 128, 1)',
-          'rgba(64, 0, 0, 1)',
-          'rgba(0, 64, 0, 1)',
-          'rgba(0, 0, 64, 1)',
-          'rgba(64, 64, 0, 1)',
-          'rgba(64, 0, 64, 1)',
-          'rgba(0, 64, 64, 1)',
-          'rgba(64, 64, 64, 1)',
-          'rgba(192, 0, 0, 1)',
-          'rgba(0, 192, 0, 1)',
-          'rgba(0, 0, 192, 1)',
-          'rgba(192, 192, 0, 1)',
-          'rgba(192, 0, 192, 1)',
-          'rgba(0, 192, 192, 1)',
-          'rgba(192, 192, 192, 1)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        datalabels: {
-          formatter: (value, ctx) => {
-            let sum = 0;
-            let dataArr = ctx.chart.data.datasets[0].data;
-            dataArr.map(data => {
-              sum += data;
-            });
-            let percentage = (value * 100 / sum).toFixed(2) + "%";
-            return percentage;
-          },
-          color: '#000',
-          font: {
-            size: 16,
-            weight: 'bold'
-          }
-        }
-      },
-      tooltips: {
-        callbacks: {
-          label: function (tooltipItem, data) {
-            const dataset = data.datasets[tooltipItem.datasetIndex];
-            const currentValue = dataset.data[tooltipItem.index];
-            const label = data.labels[tooltipItem.index];
-            return `${label}: ${currentValue}`;
-          }
-        }
-      }
-    }
-  });
-}
-
-    // Atualizar o gráfico quando a página for carregada
-    window.onload = updateChart;
-  </script>
-</body>
-</html>
->>>>>>> cdabfc9e387ec5fba987dfb924fdf14a8a8b30b9
