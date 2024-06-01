@@ -1,96 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
+import Parse from 'parse/dist/parse.min.js';
+
+Parse.initialize(
+  'e5UX3sOvZfOY3qwvIdw0b7v18JdUn9ihz34chyhF', // Application ID
+  'rSRY7ybwkJThcFwIQirObv3v83Bfa40LWPyaZQNf'  // JavaScript key
+);
+Parse.serverURL = 'https://parseapi.back4app.com';
 
 const SchoolTypeChart = () => {
   const [chartData, setChartData] = useState({});
 
   useEffect(() => {
-    const schoolTypeData = [
-      2, 3, 2, 2, 2, 2, 2, 2, 2, 2,
-      3, 2, 2, 3, 3, 3, 3, 3, 2, 2,
-      2, 4, 4, 3, 2, 3, 2, 2, 3, 3,
-      2, 2, 3, 2, 2, 2, 3, 3, 3, 4,
-      2, 2, 3, 2, 2, 2, 3, 2, 2, 3,
-      3, 3, 3, 3, 4,
-      2, 2, 3, 3, 2, 2, 2, 3, 2, 2,
-      3, 2, 3, 1, 2, 4, 2, 3, 4, 2,
-      2, 2, 3, 4, 4,
-      2, 4, 2, 4, 2, 3, 2, 3, 2, 2,
-      4, 2, 3, 2, 3, 2, 3, 3, 3,
-      3, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-      3, 3, 3, 2, 3, 3, 3, 3, 4, 4,
-      2, 2, 4, 3, 3, 3,
-    ];
+    const fetchSchoolTypeData = async () => {
+      const Dashboard = Parse.Object.extend('Dashboard');
+      const query = new Parse.Query(Dashboard);
 
-    const totalCount = schoolTypeData.length;
-    const counts = schoolTypeData.reduce((acc, value) => {
-      acc[value] = (acc[value] || 0) + 1;
-      return acc;
-    }, {});
+      // Filtros específicos
+      query.equalTo('SG_UF', 'PE');
+      query.equalTo('NO_MUNICIPIO', 'Recife');
 
-    const percentages = {};
-    for (const [key, value] of Object.entries(counts)) {
-      percentages[key] = ((value / totalCount) * 100).toFixed(2);
-    }
+      try {
+        const results = await query.find();
+        const schoolTypeData = results.map(school => school.get('TP_RESPONSAVEL_REGULAMENTACAO'));
 
-    const seriesData = Object.entries(percentages).map(([key, value]) => {
-      let type;
-      switch (key) {
-        case '1':
-          type = 'Federal';
-          break;
-        case '2':
-          type = 'Estadual';
-          break;
-        case '3':
-          type = 'Municipal';
-          break;
-        case '4':
-          type = 'Estadual e Municipal';
-          break;
-        case '5':
-          type = 'Federal e Estadual';
-          break;
-        case '6':
-          type = 'Federal, Estadual e Municipal';
-          break;
-        case '9':
-          type = 'Não informado';
-          break;
-        default:
-          type = 'Não aplicável';
-          break;
-      }
+        const totalCount = schoolTypeData.length;
+        const counts = schoolTypeData.reduce((acc, value) => {
+          acc[value] = (acc[value] || 0) + 1;
+          return acc;
+        }, {});
 
-      return {
-        x: type,
-        y: parseFloat(value),
-      };
-    });
+        const seriesData = Object.entries(counts).map(([key, value]) => {
+          const columnMapping = {
+            "1": "Federal",
+            "2": "Estadual",
+            "3": "Municipal",
+            "4": "Estadual e Municipal",
+            "5": "Federal e Estadual",
+            "6": "Federal, Estadual e Municipal",
+            "9": "Não informado"
+          };
+          return {
+            x: columnMapping[key] || 'Não aplicável',
+            y: value,
+          };
+        });
 
-    const chartData = {
-      options: {
-        chart: {
-          type: 'bar',
-        },
-        plotOptions: {
-          bar: {
-            horizontal: true,
+        const chartData = {
+          options: {
+            colors: ["#92FD8CFF"],
+            chart: {
+              type: 'bar',
+            },
+            plotOptions: {
+              bar: {
+                horizontal: true,
+              },
+            },
+            xaxis: {
+              categories: seriesData.map(data => data.x),
+            },
           },
-        },
-        xaxis: {
-          categories: seriesData.map(data => data.x),
-        },
-      },
-      series: [
-        {
-          name: 'Porcentagem',
-          data: seriesData.map(data => data.y),
-        },
-      ],
+          series: [
+            {
+              name: 'Porcentagem',
+              data: seriesData.map(data => data.y),
+            },
+          ],
+        };
+
+        setChartData(chartData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
 
-    setChartData(chartData);
+    fetchSchoolTypeData();
   }, []);
 
   if (Object.keys(chartData).length === 0) {
@@ -99,7 +84,7 @@ const SchoolTypeChart = () => {
 
   return (
     <div>
-      <h1>Distribuição de tipos de escolas Recife - PE</h1>
+      <h1 style={{ color: 'white' }}>Distribuição de tipos de escolas em Recife - PE</h1>
       <Chart options={chartData.options} series={chartData.series} type="bar" height={400} />
     </div>
   );

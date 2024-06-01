@@ -1,97 +1,78 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
+import Parse from 'parse/dist/parse.min.js';
 
-const ExcelChartComponent = () => {
+Parse.initialize(
+  'e5UX3sOvZfOY3qwvIdw0b7v18JdUn9ihz34chyhF', // Application ID
+  'rSRY7ybwkJThcFwIQirObv3v83Bfa40LWPyaZQNf'  // JavaScript key
+);
+Parse.serverURL = 'https://parseapi.back4app.com';
+
+const SchoolTypeChart = () => {
   const [chartData, setChartData] = useState({});
 
   useEffect(() => {
-    const portoVelhoSchools = [
-      3, 3, 2, 2, 2, 3, 3, 2, 2, 3,
-      3, 3, 2, 3, 2, 3, 2, 2, 3, 2,
-      2, 3, 2, 2, 2, 2, 3, 3, 3, 2,
-      3, 4, 2, 2, 2, 2, 3, 4, 4, 4,
-      2, 4, 2, 3, 2, 3, 2, 3, 4, 3,
-      2, 3, 3, 3, 2, 3, 3, 3, 3, 2,
-      3, 4, 3, 3, 3, 3, 3, 2, 2, 3,
-      3, 3, 3, 3, 4, 2, 2, 2, 3, 3,
-      3, 3, 3, 3, 3, 3, 3, 3, 2, 3,
-      3, 2, 2, 3, 3, 3, 2, 3, 3, 3,
-      3, 3, 3, 2, 2, 3, 2, 3, 4, 2,
-      3, 3, 3, 3, 3, 3, 2, 2, 3, 2,
-      2, 3, 3, 2, 3, 2, 2, 2, 2, 2,
-    ];
+    const fetchSchoolTypeData = async () => {
+      const Dashboard = Parse.Object.extend('Dashboard');
+      const query = new Parse.Query(Dashboard);
 
-    const totalCount = portoVelhoSchools.length;
-    const counts = portoVelhoSchools.reduce((acc, value) => {
-      acc[value] = (acc[value] || 0) + 1;
-      return acc;
-    }, {});
+      // Filtros específicos
+      query.equalTo('SG_UF', 'RO');
+      query.equalTo('NO_MUNICIPIO', 'Porto Velho');
 
-    const percentages = {};
-    for (const [key, value] of Object.entries(counts)) {
-      percentages[key] = ((value / totalCount) * 100).toFixed(2);
-    }
+      try {
+        const results = await query.find();
+        const schoolTypeData = results.map(school => school.get('TP_DEPENDENCIA'));
 
-    const seriesData = Object.entries(percentages).map(([key, value]) => {
-      let name;
-      let color;
-      if (key === '1') {
-        name = 'Federal';
-        color = '#009688'; 
-      } else if (key === '2') {
-        name = 'Estadual';
-        color = '#FF5722'; 
-      } else if (key === '3') {
-        name = 'Municipal';
-        color = '#3F51B5'; 
-      } else {
-        name = 'Privada';
-        color = '#FFEB3B'; 
+        const totalCount = schoolTypeData.length;
+        const counts = schoolTypeData.reduce((acc, value) => {
+          acc[value] = (acc[value] || 0) + 1;
+          return acc;
+        }, {});
+
+        const seriesData = Object.entries(counts).map(([key, value]) => {
+          const columnMapping = {
+            "1": "Federal",
+            "2": "Estadual",
+            "3": "Municipal",
+            "4": "Privada",
+          };
+          return {
+            x: columnMapping[key] || 'Não aplicável',
+            y: value,
+          };
+        });
+
+        const chartData = {
+          options: {
+            colors: ["#92FD8CFF"],
+            chart: {
+              type: 'bar',
+            },
+            plotOptions: {
+              bar: {
+                horizontal: true,
+              },
+            },
+            xaxis: {
+              categories: seriesData.map(data => data.x),
+            },
+          },
+          series: [
+            {
+              name: 'Porcentagem',
+              data: seriesData.map(data => data.y),
+            },
+          ],
+        };
+
+        setChartData(chartData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-
-      return {
-        x: name,
-        y: parseFloat(value),
-        goals: [
-          {
-            name: 'Expected',
-            value: parseFloat(value),
-            strokeColor: color,
-          }
-        ]
-      };
-    });
-
-    const chartData = {
-      options: {
-        chart: {
-          type: 'bar',
-        },
-        plotOptions: {
-          bar: {
-            horizontal: true,
-            barHeight: '80%',
-          },
-        },
-        colors: ['#009688', '#FF5722', '#3F51B5', '#FFEB3B'], 
-        tooltip: {
-          enabled: true,
-          x: {
-            show: true,
-            formatter: function (val) {
-              return '<span style="color: black;">' + val + '</span>';
-            }
-          },
-        },
-      },
-      series: [
-        {
-          data: seriesData,
-        },
-      ],
     };
 
-    setChartData(chartData);
+    fetchSchoolTypeData();
   }, []);
 
   if (Object.keys(chartData).length === 0) {
@@ -100,11 +81,10 @@ const ExcelChartComponent = () => {
 
   return (
     <div>
-      <h1>Dependência regulamento das Escolas em Porto Velho - RO</h1>
+      <h1 style={{ color: 'white' }}>Distribuição de tipos de escolas em Porto Velho - RO</h1>
       <Chart options={chartData.options} series={chartData.series} type="bar" height={400} />
-      <br />
     </div>
   );
 };
 
-export default ExcelChartComponent;
+export default SchoolTypeChart;

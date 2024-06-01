@@ -1,63 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
+import Parse from 'parse/dist/parse.min.js';
+
+Parse.initialize(
+  'e5UX3sOvZfOY3qwvIdw0b7v18JdUn9ihz34chyhF', // Application ID
+'rSRY7ybwkJThcFwIQirObv3v83Bfa40LWPyaZQNf' // JavaScript key
+);
+Parse.serverURL = 'https://parseapi.back4app.com';
 
 const SchoolStatusChart = () => {
   const [chartData, setChartData] = useState({});
 
   useEffect(() => {
-    const schoolStatusData = [
-      3, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 2, 1, 1, 1, 1, 1, 1, 3, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 3, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 3, 1, 1, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 3, 1, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    ];
+    const fetchSchoolStatusData = async () => {
+      const Dashboard = Parse.Object.extend('Dashboard');
+      const query = new Parse.Query(Dashboard);
 
-    const totalCount = schoolStatusData.length;
-    const counts = schoolStatusData.reduce((acc, value) => {
-      acc[value] = (acc[value] || 0) + 1;
-      return acc;
-    }, {});
+      // Filtros específicos
+      query.equalTo('SG_UF', 'AM');
+      query.equalTo('NO_MUNICIPIO', 'Coari');
 
-    const percentages = {};
-    for (const [key, value] of Object.entries(counts)) {
-      percentages[key] = ((value / totalCount) * 100).toFixed(2);
-    }
+      try {
+        const results = await query.find();
+        const schoolStatusData = results.map(school => school.get('TP_SITUACAO_FUNCIONAMENTO'));
 
-    const seriesData = Object.entries(percentages).map(([key, value]) => {
-      let status;
-      if (key === '1') {
-        status = 'Em Atividade';
-      } else if (key === '2') {
-        status = 'Paralisada';
-      } else if (key === '3') {
-        status = 'Extinta (ano do Censo)';
-      } else {
-        status = 'Extinta em Anos Anteriores';
+        const totalCount = schoolStatusData.length;
+        const counts = schoolStatusData.reduce((acc, value) => {
+          acc[value] = (acc[value] || 0) + 1;
+          return acc;
+        }, {});
+
+        const columnMapping = {
+          "1": "Em Atividade",
+          "2": "Paralisada",
+          "3": "Extinta (ano do Censo)",
+          
+        };
+
+        const seriesData = Object.entries(counts).map(([key, value]) => {
+          return {
+            x: columnMapping[key] || key,
+            y: value,
+          };
+        });
+
+        const chartData = {
+          options: {
+            colors: ["#92fd8c", "#ff5959", "#a6a6a6"],
+            chart: {
+              type: 'pie',
+            },
+            labels: seriesData.map(data => data.x),
+          },
+          series: seriesData.map(data => data.y),
+        };
+
+        setChartData(chartData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-
-      return {
-        x: status,
-        y: parseFloat(value),
-      };
-    });
-
-    const chartData = {
-      options: {
-        chart: {
-          type: 'pie',
-        },
-        labels: seriesData.map(data => data.x),
-      },
-      series: seriesData.map(data => data.y),
     };
 
-    setChartData(chartData);
+    fetchSchoolStatusData();
   }, []);
 
   if (Object.keys(chartData).length === 0) {
@@ -66,10 +70,11 @@ const SchoolStatusChart = () => {
 
   return (
     <div>
-      <h1> Status de funcionamento das escolas de Caori - RO</h1>
+      <h1 style={{ color: 'white' }}>Status de funcionamento das escolas de Coari - AM</h1>
       <Chart options={chartData.options} series={chartData.series} type="pie" height={400} />
     </div>
   );
 };
+
 
 export default SchoolStatusChart;
