@@ -125,7 +125,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <script>
-    // Configuração
  
 Parse.initialize(
 'e5UX3sOvZfOY3qwvIdw0b7v18JdUn9ihz34chyhF', // Application ID
@@ -203,7 +202,6 @@ async function updateMunicipiosSelect() {
       const uf = document.getElementById('filterUF').value;
       const municipioSelect = document.getElementById('filterMunicipio');
 
-      // Limpa as opções do select de município
       municipioSelect.innerHTML = '<option value="">Todos</option>';
 
       if (uf) {
@@ -214,15 +212,14 @@ async function updateMunicipiosSelect() {
           option.textContent = municipio;
           municipioSelect.appendChild(option);
         });
-        updateChart(); // Atualiza o gráfico quando um UF é selecionado
-      }
+        updateChart(); 
+            }
     }
 
 async function fetchData(column) {
   const Dashboard = Parse.Object.extend('Dashboard');
   const query = new Parse.Query(Dashboard);
 
-  // Adicionando filtros conforme os valores selecionados
   const situacao = document.getElementById('filterSituacao').value;
   const localizacao = document.getElementById('filterLocalizacao').value;
   const ocupacao = document.getElementById('filterOcupacao').value;
@@ -238,7 +235,6 @@ async function fetchData(column) {
     query.equalTo("TP_RESPONSAVEL_REGULAMENTACAO", regulamentacao);
   }
 
-  // Removendo os filtros vazios para não limitar a consulta
   if (situacao) {
     query.equalTo("TP_SITUACAO_FUNCIONAMENTO", situacao);
   }
@@ -255,7 +251,7 @@ async function fetchData(column) {
     query.equalTo("NO_MUNICIPIO", municipio);
   }
 
-  query.limit(217625);  // Ajuste o limite conforme necessário
+  query.limit(217625);  
   const results = await query.find();
 
   const dataCount = {};
@@ -278,7 +274,7 @@ async function updateChart() {
   const total = values.reduce((sum, value) => sum + value, 0);
 
   if (myChart) {
-    myChart.destroy(); // Destruir o gráfico anterior, se existir
+    myChart.destroy(); 
   }
 
   const ctx = document.getElementById('myChart').getContext('2d');
@@ -396,7 +392,6 @@ async function updateChart() {
   });
 }
 
-    // Atualizar o gráfico quando a página for carregada
     window.onload = updateChart;
   </script>
 </body>

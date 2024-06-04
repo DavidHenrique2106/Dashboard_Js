@@ -16,7 +16,6 @@ const UrbanRuralSchoolsChart = () => {
       const Dashboard = Parse.Object.extend('Dashboard');
       const query = new Parse.Query(Dashboard);
 
-      // Filtros específicos
       query.equalTo('SG_UF', 'PE');
       query.equalTo('NO_MUNICIPIO', 'Paulista');
 

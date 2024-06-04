@@ -16,7 +16,6 @@ const SchoolTypeChart = () => {
       const Dashboard = Parse.Object.extend('Dashboard');
       const query = new Parse.Query(Dashboard);
 
-      // Filtros específicos
       query.equalTo('SG_UF', 'RO');
       query.equalTo('NO_MUNICIPIO', 'Porto Velho');
 
